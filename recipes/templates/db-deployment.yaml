@@ -40,7 +40,6 @@ spec:
             - name: POSTGRES_DB
               value: {{ (.Values.db | default dict).name | default "djangodb" | quote }}
             - name: POSTGRES_HOST
-              # IMPORTANT: For sidecar containers, use localhost to connect to the other container in the same pod
               value: "127.0.0.1"
             - name: POSTGRES_PORT
               value: {{ (.Values.db | default dict).port | default "5432" | quote }}
