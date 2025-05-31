@@ -1,0 +1,50 @@
+{{- if .Values.gateway.enabled -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: recipes-tls
+spec:
+  dnsNames:
+  - {{ .Values.gateway.host }}
+  issuerRef:
+    name: cloudflare-issuer
+    kind: ClusterIssuer
+  secretName: recipes-tls
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: recipes-https-gateway
+spec:
+  gatewayClassName: {{ .Values.gateway.className | default "traefik" | quote }}
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 8443
+    hostname: {{ .Values.gateway.host }}
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: recipes-tls
+        namespace: recipes
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: recipes-https-route
+spec:
+  parentRefs:
+  - name: recipes-https-gateway
+  hostnames:
+  - {{ .Values.gateway.host }}
+  rules:
+  - matches:
+    - path:
+        type: {{ .Values.gateway.pathType | default "PathPrefix" | quote }}
+        value: {{ .Values.gateway.path | default "/" | quote }}
+    backendRefs:
+    - kind: Service
+      name: {{ include "recipes.fullname" . }}
+      namespace: recipes
+      port: {{ .Values.service.port | default 80 | quote }}
+{{- end }}
