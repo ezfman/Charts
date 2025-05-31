@@ -41,7 +41,7 @@ spec:
             - mountPath: /var/lib/postgresql/data
               name: recipes-db-claim
           resources:
-            {{- toYaml .Values.db.resources | nindent 12 }}
+            {{- toYaml (.Values.db | default dict).resources | nindent 12 }}
       volumes:
         - name: recipes-db-claim
           persistentVolumeClaim:

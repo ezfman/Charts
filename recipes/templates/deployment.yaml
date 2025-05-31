@@ -45,7 +45,7 @@ spec:
               value: {{ (.Values.db | default dict).name | default "djangodb" | quote }}
             - name: POSTGRES_HOST
               # IMPORTANT: This should be the service name of your PostgreSQL deployment
-              value: {{ .Values.db.host | default (printf "%s-db" (include "recipes.fullname" .)) | quote }}
+              value: {{ (.Values.db | default dict).host | default (printf "%s-db" (include "recipes.fullname" .)) | quote }}
             - name: POSTGRES_PORT
               value: {{ (.Values.db | default dict).port | default "5432" | quote }}
             - name: POSTGRES_USER
