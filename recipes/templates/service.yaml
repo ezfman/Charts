@@ -5,9 +5,11 @@ metadata:
   labels:
     {{- include "recipes.labels" . | nindent 4 }}
 spec:
+  type: ClusterIP # Or LoadBalancer if you want an external IP directly
   ports:
     - name: http
       port: {{ .Values.service.port | default 80 }}
       targetPort: 8080
+      protocol: TCP
   selector:
     {{- include "recipes.selectorLabels" . | nindent 4 }}

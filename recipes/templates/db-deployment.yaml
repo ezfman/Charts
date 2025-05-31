@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "recipes.fullname" . }}-db
+  labels:
+    {{- include "recipes.labels" . | nindent 4 }}
+spec:
+  replicas: 1 # Databases are usually not scaled like this. Consider StatefulSet for production.
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "recipes.name" . }}-db
+      app.kubernetes.io/instance: {{ .Release.Name }}-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "recipes.name" . }}-db
+        app.kubernetes.io/instance: {{ .Release.Name }}-db
+    spec:
+      containers:
+        - name: postgres
+          image: "postgres:{{ (.Values.db | default dict).tag | default "16-alpine" }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          env:
+            - name: POSTGRES_DB
+              value: {{ (.Values.db | default dict).name | default "djangodb" | quote }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: recipes-login
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: recipes-login
+                  key: password
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: recipes-db-claim
+          resources:
+            {{- toYaml .Values.db.resources | nindent 12 }}
+      volumes:
+        - name: recipes-db-claim
+          persistentVolumeClaim:
+            claimName: recipes-db-claim
