@@ -116,10 +116,10 @@ spec:
           {{- end }}
           image: "postgres:{{ (.Values.db | default dict).tag | default "16-alpine" }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port | default 8080 }}
-              protocol: TCP
+          # ports:
+          #   - name: http
+          #     containerPort: {{ .Values.service.port | default 8080 }}
+          #     protocol: TCP
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
