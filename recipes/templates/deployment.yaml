@@ -67,7 +67,9 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "vabene1111/recipes:{{ .Values.image.tag | default (.Chart.AppVersion | default "latest" | quote) }}"
+          image:
+            repository: {{ .Values.image.repository | default "vabene1111/recipes" | quote }}
+            tag: {{ .Values.image.tag | default (.Chart.AppVersion | default "latest" | quote) }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
