@@ -90,7 +90,57 @@ spec:
               name: recipes-staticfiles-claim
             - mountPath: /opt/recipes/mediafiles
               name: recipes-mediafiles-claim
+      - name: {{ .Chart.Name }}-db
+          env:
+            - name: DB_ENGINE
+              value: {{ (.Values.db | default dict).engine | default "django.db.backends.postgresql" | quote }}
+            - name: POSTGRES_DB
+              value: {{ (.Values.db | default dict).name | default "djangodb" | quote }}
+            - name: POSTGRES_HOST
+              value: "127.0.0.1"
+            - name: POSTGRES_PORT
+              value: {{ (.Values.db | default dict).port | default "5432" | quote }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: recipes-login
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: recipes-login
+                  key: password
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image:
+            repository: "postgres"
+            tag: {{ (.Values.db | default dict).tag | default "16-alpine" | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port | default 8080 }}
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: recipes-db-claim
       volumes:
+        - name: recipes-db-claim
+          persistentVolumeClaim:
+            claimName: recipes-db-claim
         - name: recipes-mediafiles-claim
           persistentVolumeClaim:
             claimName: recipes-mediafiles-claim
