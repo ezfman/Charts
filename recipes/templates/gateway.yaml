@@ -46,5 +46,5 @@ spec:
     - kind: Service
       name: {{ include "recipes.fullname" . }}
       namespace: recipes
-      port: {{ .Values.service.port | default 80 | quote }}
+      port: {{ .Values.service.port | default 80 }}
 {{- end }}
