@@ -57,7 +57,9 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "postgres:{{ (.Values.db | default dict).tag | default "16-alpine" | quote }}"
+          image:
+            repository: "postgres"
+            tag: {{ (.Values.db | default dict).tag | default "16-alpine" | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
