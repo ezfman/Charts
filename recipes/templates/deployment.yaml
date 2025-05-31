@@ -67,9 +67,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image:
-            repository: {{ .Values.image.repository | default "vabene1111/recipes" | quote }}
-            tag: {{ .Values.image.tag | default (.Chart.AppVersion | default "latest" | quote) }}
+          image: "{{ .Values.image.repository | default "vabene1111/recipes" }}:{{ .Values.image.tag | default (.Chart.AppVersion | default "latest") }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -116,9 +114,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image:
-            repository: "postgres"
-            tag: {{ (.Values.db | default dict).tag | default "16-alpine" | quote }}
+          image: "postgres:{{ (.Values.db | default dict).tag | default "16-alpine" }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
