@@ -90,7 +90,7 @@ spec:
               name: recipes-staticfiles-claim
             - mountPath: /opt/recipes/mediafiles
               name: recipes-mediafiles-claim
-      - name: {{ .Chart.Name }}-db
+        - name: {{ .Chart.Name }}-db
           env:
             - name: DB_ENGINE
               value: {{ (.Values.db | default dict).engine | default "django.db.backends.postgresql" | quote }}
